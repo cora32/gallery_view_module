@@ -120,25 +120,25 @@ fun HorizontalGalleryView(model: GalleryModel, height: Dp) {
 fun GridGalleryView(model: GalleryModel) {
     val imageList = model.mediaFiles
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-        if (imageList.isEmpty()) NoDataText()
-        else Column {
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    stringResource(R.string.recent),
-                    fontSize = 23.sp,
-                    color = Color.White,
-                )
-                ClearButtonBig(model)
-            }
-            Box(modifier = Modifier.height(32.dp))
-            LazyVerticalGrid(
+    Column {
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                stringResource(R.string.recent),
+                fontSize = 23.sp,
+                color = Color.White,
+            )
+            ClearButtonBig(model)
+        }
+        Box(modifier = Modifier.height(32.dp))
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+            if (imageList.isEmpty()) NoDataText()
+            else LazyVerticalGrid(
                 columns = GridCells.Adaptive(minSize = 128.dp),
                 horizontalArrangement = Arrangement.Absolute.SpaceEvenly,
                 contentPadding = PaddingValues(4.dp),

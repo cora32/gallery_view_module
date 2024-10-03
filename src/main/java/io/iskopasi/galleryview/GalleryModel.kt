@@ -92,13 +92,21 @@ class GalleryModel(context: Application, private val saveDirectory: File) :
     }
 
     private fun File.getDuration(): Long {
-        retriever.setDataSource(getApplication(), Uri.fromFile(this))
-        return retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLong()
-            ?: -1
+        try {
+            retriever.setDataSource(getApplication(), Uri.fromFile(this))
+            return retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLong()
+                ?: -1
+        } catch (ex: Exception) {
+            return -1
+        }
     }
 
     fun clear() = viewModelScope.launch(Dispatchers.IO) {
-        saveDirectory.deleteRecursively()
+        if (saveDirectory.exists()) {
+            for (child in saveDirectory.listFiles()!!)
+                child.delete()
+        }
+
         refresh()
     }
 
