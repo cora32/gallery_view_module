@@ -2,6 +2,7 @@ package io.iskopasi.galleryview
 
 import android.annotation.SuppressLint
 import android.text.format.DateUtils
+import java.io.File
 
 @SuppressLint("DefaultLocale")
 fun Long.toElapsed(): String {
@@ -31,3 +32,17 @@ private fun Long.toDaysPlural(): String {
         else -> " days"
     }
 }
+
+
+val File.isVisualMedia
+    get() =
+        extension.isVisualMedia
+
+val String.isVisualMedia
+    get() =
+        endsWith("webm") ||
+                endsWith("avi") ||
+                endsWith("mp4") ||
+                endsWith("jpg") ||
+                endsWith("jpeg") ||
+                endsWith("png")

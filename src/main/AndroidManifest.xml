@@ -9,11 +9,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SimplyMotion">
 
-        <activity
-            android:name="io.iskopasi.simplymotion.activities.GalleryActivity"
-            android:exported="false"
-            android:theme="@style/Theme.SimplyMotion" />
-
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"

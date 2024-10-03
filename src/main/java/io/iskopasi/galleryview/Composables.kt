@@ -49,6 +49,16 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import kotlinx.coroutines.launch
 
+@Composable
+fun BoxScope.NoDataText() {
+    Text(
+        text = stringResource(R.string.no_data),
+        color = Color.White,
+        fontSize = 19.sp,
+        modifier = Modifier.align(Alignment.Center)
+    )
+}
+
 @OptIn(ExperimentalGlideComposeApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun HorizontalGalleryView(model: GalleryModel, height: Dp) {
@@ -67,12 +77,7 @@ fun HorizontalGalleryView(model: GalleryModel, height: Dp) {
             .fillMaxWidth()
             .height(height)
     ) {
-        if (imageList.isEmpty()) Text(
-            text = stringResource(R.string.no_data),
-            color = Color.White,
-            fontSize = 19.sp,
-            modifier = Modifier.align(Alignment.Center)
-        )
+        if (imageList.isEmpty()) NoDataText()
         else
             LazyRow(
                 state = listState,
@@ -115,47 +120,53 @@ fun HorizontalGalleryView(model: GalleryModel, height: Dp) {
 fun GridGalleryView(model: GalleryModel) {
     val imageList = model.mediaFiles
 
-    Column {
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(
-                stringResource(R.string.recent),
-                fontSize = 23.sp,
-                color = Color.White,
-            )
-            ClearButtonBig(model)
-        }
-        Box(modifier = Modifier.height(32.dp))
-        LazyVerticalGrid(
-            columns = GridCells.Adaptive(minSize = 128.dp),
-            horizontalArrangement = Arrangement.Absolute.SpaceEvenly,
-            contentPadding = PaddingValues(4.dp),
-            modifier = Modifier.fillMaxSize()
-        ) {
-            items(items = imageList,
-                key = {
-                    it.file.name
-                }) { item ->
-                val length = DateUtils
-                    .formatElapsedTime(item.length / 1000)
-                val elapsed = item.file.lastModified().toElapsed()
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+    ) {
+        if (imageList.isEmpty()) NoDataText()
+        else Column {
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    stringResource(R.string.recent),
+                    fontSize = 23.sp,
+                    color = Color.White,
+                )
+                ClearButtonBig(model)
+            }
+            Box(modifier = Modifier.height(32.dp))
+            LazyVerticalGrid(
+                columns = GridCells.Adaptive(minSize = 128.dp),
+                horizontalArrangement = Arrangement.Absolute.SpaceEvenly,
+                contentPadding = PaddingValues(4.dp),
+                modifier = Modifier.fillMaxSize()
+            ) {
+                items(items = imageList,
+                    key = {
+                        it.file.name
+                    }) { item ->
+                    val length = DateUtils
+                        .formatElapsedTime(item.length / 1000)
+                    val elapsed = item.file.lastModified().toElapsed()
 
-                Box(
-                    modifier = Modifier
-                        .padding(4.dp)
-                        .animateItemPlacement()
-                ) {
-                    VideoItem(
-                        item, length, elapsed,
-                        {
-                            model.onClick?.invoke(item.file)
-                        },
-                        {
-                            model.remove(item.file)
-                        },
-                    )
+                    Box(
+                        modifier = Modifier
+                            .padding(4.dp)
+                            .animateItemPlacement()
+                    ) {
+                        VideoItem(
+                            item, length, elapsed,
+                            {
+                                model.onClick?.invoke(item.file)
+                            },
+                            {
+                                model.remove(item.file)
+                            },
+                        )
+                    }
                 }
             }
         }
@@ -257,7 +268,17 @@ fun ClearButton(galleryModel: GalleryModel) {
                 RoundedCornerShape(32.dp)
             )
             .background(Color.White.copy(alpha = 0.7f))
-            .clickable(onClick = galleryModel::clear)
+            .clickable(
+                onClick = galleryModel::clear,
+                enabled = true,
+                role = Role.Button,
+                interactionSource = remember { MutableInteractionSource() },
+                indication = rememberRipple(
+                    bounded = false,
+                    radius = 64.dp,
+                    color = Color.Black
+                )
+            )
     ) {
         Text(
             stringResource(R.string.clear),
@@ -285,7 +306,17 @@ fun ClearButtonBig(galleryModel: GalleryModel) {
                 RoundedCornerShape(32.dp)
             )
             .background(Color.White.copy(alpha = 0.7f))
-            .clickable(onClick = galleryModel::clear)
+            .clickable(
+                onClick = galleryModel::clear,
+                enabled = true,
+                role = Role.Button,
+                interactionSource = remember { MutableInteractionSource() },
+                indication = rememberRipple(
+                    bounded = false,
+                    radius = 96.dp,
+                    color = Color.Black
+                )
+            )
     ) {
         Text(
             stringResource(R.string.clear_all),

@@ -3,8 +3,6 @@ package io.iskopasi.galleryview
 import android.app.Application
 import android.media.MediaMetadataRetriever
 import android.net.Uri
-import android.os.Build
-import android.os.FileObserver
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -26,57 +24,58 @@ class GalleryModelFactory(private val context: Application, private val saveDire
 
 class GalleryModel(context: Application, private val saveDirectory: File) :
     AndroidViewModel(context) {
-    var mediaFiles by mutableStateOf(listOf<GalleryData>())
-    private var onRefresh: ( () -> Unit)? = null
-    private var onDelete: ( () -> Unit)? = null
-    var onClick: ( (file: File) -> Unit)? = null
-    private val retriever = MediaMetadataRetriever()
-    private val observer = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) object : FileObserver(
-        File(saveDirectory.absolutePath + "/"),
-        CLOSE_WRITE
-    ) {
-        override fun onEvent(event: Int, path: String?) {
-            checkEvent(event, path)
+    companion object {
+        private var observer: GalleryObserver? = null
+
+        fun initObserver(saveDirectory: File): GalleryObserver {
+            if (observer == null) {
+                observer = GalleryObserver(saveDirectory)
+            }
+
+            return observer!!
         }
     }
-    else object : FileObserver(
-        saveDirectory.absolutePath + "/",
-        CLOSE_WRITE
-    ) {
-        override fun onEvent(event: Int, path: String?) {
-            checkEvent(event, path)
+
+    var mediaFiles by mutableStateOf(listOf<GalleryData>())
+    var onClick: ((file: File) -> Unit)? = null
+    private var onRefresh: (() -> Unit)? = null
+    private var onDelete: (() -> Unit)? = null
+    private val retriever = MediaMetadataRetriever()
+
+    // Respond only for create and remove events
+    private fun onNewVideoFileEvent() {
+        refresh().invokeOnCompletion {
+            viewModelScope.launch(Dispatchers.Main) { onRefresh?.invoke() }
         }
     }
 
     fun start() {
         // Initial refresh
-        refresh()
-
-        observer.startWatching()
+        refresh().invokeOnCompletion {
+            initObserver(saveDirectory)
+                .apply {
+                    addListener(this@GalleryModel.hashCode().toString(), ::onNewVideoFileEvent)
+                    startWatching()
+                }
+        }
     }
 
-    // Respond only for create and remove events
-    private fun checkEvent(event: Int, path: String?) {
-        refresh()
-
-        viewModelScope.launch(Dispatchers.Main) { onRefresh?.invoke() }
-    }
-
-    fun refresh() = viewModelScope.launch(Dispatchers.IO) {
+    private fun refresh() = viewModelScope.launch(Dispatchers.IO) {
         mediaFiles = getFiles() ?: listOf()
     }
 
     private fun getFiles(): List<GalleryData>? = saveDirectory.listFiles { file ->
         file.isVisualMedia
     }?.sortedBy { it.lastModified() }?.reversed()?.toList()?.map {
-        GalleryData(it, it.getDuration()) }
+        GalleryData(it, it.getDuration())
+    }
 
     fun remove(item: File) {
-        if(item.exists()) {
+        if (item.exists()) {
             item.delete()
-            refresh()
-
-            onDelete?.invoke()
+            refresh().invokeOnCompletion {
+                onDelete?.invoke()
+            }
         }
     }
 
@@ -92,22 +91,19 @@ class GalleryModel(context: Application, private val saveDirectory: File) :
         onClick = function
     }
 
-    private val File.isVisualMedia
-        get() =
-            extension == "webm" ||
-                    extension == "avi" ||
-                    extension == "mp4" ||
-                    extension == "jpg" ||
-                    extension == "jpeg" ||
-                    extension == "png"
-
     private fun File.getDuration(): Long {
         retriever.setDataSource(getApplication(), Uri.fromFile(this))
-        return retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLong() ?: -1
+        return retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLong()
+            ?: -1
     }
 
-    fun clear() {
+    fun clear() = viewModelScope.launch(Dispatchers.IO) {
         saveDirectory.deleteRecursively()
+        refresh()
+    }
+
+    fun onDestroy() {
+        observer?.removeListener(this.hashCode().toString())
     }
 }
 
