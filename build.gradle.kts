@@ -2,9 +2,6 @@ plugins {
     id("com.android.library")
     alias(libs.plugins.jetbrains.kotlin.android)
     id("org.jetbrains.kotlin.plugin.compose") version "2.0.0" // this version matches your Kotlin version
-
-//    kotlin("kapt")
-    id("com.google.devtools.ksp") version "2.0.0-1.0.22" apply true
 }
 
 android {

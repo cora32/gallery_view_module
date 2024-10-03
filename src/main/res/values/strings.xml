@@ -2,4 +2,7 @@
     <string name="app_name">GalleryView</string>
     <string name="ago">%s ago</string>
     <string name="no_data">No data</string>
+    <string name="clear">Clear</string>
+    <string name="clear_all">Clear all</string>
+    <string name="recent">Recent:</string>
 </resources>

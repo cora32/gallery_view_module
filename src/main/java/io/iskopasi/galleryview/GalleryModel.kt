@@ -1,8 +1,6 @@
 package io.iskopasi.galleryview
 
 import android.app.Application
-import android.content.Context
-import android.content.Intent
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Build
@@ -10,7 +8,6 @@ import android.os.FileObserver
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.core.content.FileProvider
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -107,6 +104,10 @@ class GalleryModel(context: Application, private val saveDirectory: File) :
     private fun File.getDuration(): Long {
         retriever.setDataSource(getApplication(), Uri.fromFile(this))
         return retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)?.toLong() ?: -1
+    }
+
+    fun clear() {
+        saveDirectory.deleteRecursively()
     }
 }
 
