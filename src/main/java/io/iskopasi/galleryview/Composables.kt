@@ -6,7 +6,6 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -28,11 +27,9 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,6 +45,8 @@ import com.bumptech.glide.integration.compose.CrossFade
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import kotlinx.coroutines.launch
+
+//import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun BoxScope.NoDataText() {
@@ -213,11 +212,11 @@ fun BoxScope.VideoItem(
                             onClick = onRemove,
                             enabled = true,
                             role = Role.Button,
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = rememberRipple(
-                                bounded = false,
-                                radius = 20.dp
-                            )
+//                            interactionSource = remember { MutableInteractionSource() },
+//                            indication = rememberRipple(
+//                                bounded = false,
+//                                radius = 20.dp
+//                            )
                         )
                         .border(
                             1.dp,
@@ -272,12 +271,12 @@ fun ClearButton(galleryModel: GalleryModel) {
                 onClick = galleryModel::clear,
                 enabled = true,
                 role = Role.Button,
-                interactionSource = remember { MutableInteractionSource() },
-                indication = rememberRipple(
-                    bounded = false,
-                    radius = 64.dp,
-                    color = Color.Black
-                )
+//                interactionSource = remember { MutableInteractionSource() },
+//                indication = rememberRipple(
+//                    bounded = false,
+//                    radius = 64.dp,
+//                    color = Color.Black
+//                )
             )
     ) {
         Text(
@@ -310,12 +309,12 @@ fun ClearButtonBig(galleryModel: GalleryModel) {
                 onClick = galleryModel::clear,
                 enabled = true,
                 role = Role.Button,
-                interactionSource = remember { MutableInteractionSource() },
-                indication = rememberRipple(
-                    bounded = false,
-                    radius = 96.dp,
-                    color = Color.Black
-                )
+//                interactionSource = remember { MutableInteractionSource() },
+//                indication = rememberRipple(
+//                    bounded = false,
+//                    radius = 96.dp,
+//                    color = Color.Black
+//                )
             )
     ) {
         Text(

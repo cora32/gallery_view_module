@@ -7,22 +7,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
 
 
-class GalleryModelFactory(private val context: Application, private val saveDirectory: File) :
-    ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return GalleryModel(context, saveDirectory) as T
-    }
-}
+//class GalleryModelFactory(private val context: Application, private val saveDirectory: File = context.filesDir) :
+//    ViewModelProvider.Factory {
+//    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+//        return GalleryModel(context, saveDirectory) as T
+//    }
+//}
 
-class GalleryModel(context: Application, private val saveDirectory: File) :
+class GalleryModel(context: Application) :
     AndroidViewModel(context) {
     companion object {
         private var observer: GalleryObserver? = null
@@ -41,6 +39,7 @@ class GalleryModel(context: Application, private val saveDirectory: File) :
     private var onRefresh: (() -> Unit)? = null
     private var onDelete: (() -> Unit)? = null
     private val retriever = MediaMetadataRetriever()
+    private val saveDirectory by lazy { getApplication<Application>().filesDir }
 
     // Respond only for create and remove events
     private fun onNewVideoFileEvent() {
